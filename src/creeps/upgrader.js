@@ -29,14 +29,14 @@ var roleUpgrader = {
 		);
 		console.log('Upgraders: ' + upgraders.length, room.name);
 
-		if (upgraders.length < 2) {
+		if (upgraders.length < 4) {
 			return true;
 		}
 	},
 	// returns an object with the data to spawn a new creep
 	spawnData: function(room) {
 		let name = 'Upgrader' + Game.time;
-		let body = [ WORK, CARRY, MOVE ];
+		let body = getBody([ WORK, CARRY, MOVE ], room);
 		let memory = { role: 'upgrader' };
 
 		return { name, body, memory };

@@ -2,6 +2,25 @@ let creepLogic = require('./creeps');
 let roomLogic = require('./room');
 let prototypes = require('./prototypes');
 
+function getBody(segment, room) {
+    let body = [];
+
+    //how much each segment costs
+    let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
+
+    // how much energy we can use total
+    let energyAvailable = room.energyCapacityAvailable;
+
+    // how many times we can include the segment with room energy
+    let maxSegments = Math.floor(energyAvailable / segmentCost);
+
+    // push the segment multiple times
+    _.times(maxSegments, function () {
+        _.forEach(segment, s=> body.push(s));
+    });
+
+    return body;
+}
 
 module.exports.loop = function () {
     // make a list of all of our rooms

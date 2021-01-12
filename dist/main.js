@@ -143,7 +143,7 @@ var harvester = {
 		);
 		console.log('Harvesters: ' + harvesters.length, room.name);
 
-		if (harvesters.length < 2) {
+		if (harvesters.length < 4) {
 			return true;
 		}
 	},
@@ -193,7 +193,7 @@ var roleUpgrader = {
 		);
 		console.log('Upgraders: ' + upgraders.length, room.name);
 
-		if (upgraders.length < 2) {
+		if (upgraders.length < 4) {
 			return true;
 		}
 	},
@@ -243,7 +243,7 @@ var builder = {
 		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
 		console.log('Builders: ' + builders.length, room.name);
 
-		if (builders.length < 2) {
+		if (builders.length < 4) {
 			return true;
 		}
 	},
@@ -288,9 +288,39 @@ return module.exports;
 /********** End of module 7: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
 /********** Start module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
 __modules[8] = function(module, exports) {
-Creep.prototype.sayHello = function sayHello() {
-    this.say("Hello", true);
-}
+Creep.prototype.findEnergySource = function findEnergySource() {
+	let sources = this.room.find(FIND_SOURCES);
+	if (sources.length) {
+		let source = _.find(sources, function(s) {
+			console.log(s.pos, s.pos.getOpenPositions());
+			return s.pos.getOpenPositions().length > 0;
+		});
+
+		console.log(sources.length, source);
+		if (source) {
+			this.memory.source = source.id;
+
+			return source;
+		}
+	}
+};
+
+Creep.prototype.harvestEnergy = function harvestEnergy() {
+	let storedSource = Game.getObjectById(creep.memory.source);
+	if (!storedSource || (!storedSource.pos.getOpenPositions().length && !this.pos.isNearTo(storedSource))) {
+		delete this.memory.source;
+		storedSource = this.findEnergySource();
+	}
+
+	if (storedSource) {
+		if (this.pos.isNearTo(storedSource)) {
+			this.harvest(storedSource);
+		} else {
+			this.moveTo(storedSource, { visualizePathStyle: { stroke: '#ffaa00' } });
+		}
+	}
+};
+
 return module.exports;
 }
 /********** End of module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/

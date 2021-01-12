@@ -32,14 +32,14 @@ var harvester = {
 		);
 		console.log('Harvesters: ' + harvesters.length, room.name);
 
-		if (harvesters.length < 2) {
+		if (harvesters.length < 4) {
 			return true;
 		}
 	},
 	// returns an object with the data to spawn a new creep
 	spawnData: function(room) {
 		let name = 'Harvester' + Game.time;
-		let body = [ WORK, CARRY, MOVE ];
+		let body = getBody([ WORK, CARRY, MOVE ], room);
 		let memory = { role: 'harvester' };
 
 		return { name, body, memory };

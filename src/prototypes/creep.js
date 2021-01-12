@@ -23,7 +23,7 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
 	}
 
 	if (storedSource) {
-		if (this.isNearTo(storedSource)) {
+		if (this.pos.isNearTo(storedSource)) {
 			this.harvest(storedSource);
 		} else {
 			this.moveTo(storedSource, { visualizePathStyle: { stroke: '#ffaa00' } });

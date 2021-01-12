@@ -29,14 +29,14 @@ var builder = {
 		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
 		console.log('Builders: ' + builders.length, room.name);
 
-		if (builders.length < 2) {
+		if (builders.length < 4) {
 			return true;
 		}
 	},
 	// returns an object with the data to spawn a new creep
 	spawnData: function(room) {
 		let name = 'Builder' + Game.time;
-		let body = [ WORK, CARRY, MOVE ];
+		let body = getBody([ WORK, CARRY, MOVE ], room);
 		let memory = { role: 'builder' };
 
 		return { name, body, memory };

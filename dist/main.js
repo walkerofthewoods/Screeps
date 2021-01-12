@@ -80,18 +80,20 @@ return module.exports;
 /********** Start module 1: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\index.js **********/
 __modules[1] = function(module, exports) {
 let creepLogic = {
-    harvester:     __require(4,1),
-    upgrader:      __require(5,1),
-}
+	harvester: __require(4,1),
+	upgrader: __require(5,1),
+	builder: __require(6,1)
+};
 
 module.exports = creepLogic;
+
 return module.exports;
 }
 /********** End of module 1: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\index.js **********/
 /********** Start module 2: C:\Users\walke\Documents\Coding\screeps code folder\src\room\index.js **********/
 __modules[2] = function(module, exports) {
 let roomLogic = {
-    spawning:     __require(6,2),
+    spawning:     __require(7,2),
 }
 
 module.exports = roomLogic;
@@ -101,7 +103,7 @@ return module.exports;
 /********** Start module 3: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\index.js **********/
 __modules[3] = function(module, exports) {
 let files = {
-    creep: __require(7,3)
+    creep: __require(8,3)
 }
 return module.exports;
 }
@@ -209,9 +211,59 @@ module.exports = roleUpgrader;
 return module.exports;
 }
 /********** End of module 5: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\upgrader.js **********/
-/********** Start module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
+/********** Start module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\builder.js **********/
 __modules[6] = function(module, exports) {
-let creepLogic = __require(1,6);
+var builder = {
+	/** @param {Creep} creep **/
+	run: function(creep) {
+		if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
+			creep.memory.building = false;
+			creep.say('🔄 harvest');
+		}
+		if (!creep.memory.building && creep.store.getFreeCapacity() == 0) {
+			creep.memory.building = true;
+			creep.say('🚧 build');
+		}
+
+		if (creep.memory.building) {
+			var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+			if (targets.length) {
+				if (creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
+					creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
+				}
+			}
+		} else {
+			var sources = creep.room.find(FIND_SOURCES);
+			if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
+				creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ffaa00' } });
+			}
+		}
+	},
+	spawn: function(room) {
+		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
+		console.log('Builders: ' + builders.length, room.name);
+
+		if (builders.length < 2) {
+			return true;
+		}
+	},
+	spawnData: function(room) {
+		let name = 'Builder' + Game.time;
+		let body = [ WORK, CARRY, MOVE ];
+		let memory = { role: 'builder' };
+
+		return { name, body, memory };
+	}
+};
+
+module.exports = builder;
+
+return module.exports;
+}
+/********** End of module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\builder.js **********/
+/********** Start module 7: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
+__modules[7] = function(module, exports) {
+let creepLogic = __require(1,7);
 let creepTypes = _.keys(creepLogic);
 
 function spawnCreeps(room) {
@@ -220,9 +272,9 @@ function spawnCreeps(room) {
         return creepLogic[type].spawn(room);
     });
     let creepSpawnData = creepLogic[creepTypeNeeded] && creepLogic[creepTypeNeeded].spawnData(room);
-    console.log(room, JSON.stringify(creepSpawnData));
-
+    
     if (creepSpawnData) {
+        console.log(room, JSON.stringify(creepSpawnData));
         let spawn = room.find(FIND_MY_SPAWNS)[0];
         let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, {memory: creepSpawnData.memory});
     
@@ -233,15 +285,15 @@ function spawnCreeps(room) {
 module.exports = spawnCreeps;
 return module.exports;
 }
-/********** End of module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
-/********** Start module 7: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
-__modules[7] = function(module, exports) {
+/********** End of module 7: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
+/********** Start module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
+__modules[8] = function(module, exports) {
 Creep.prototype.sayHello = function sayHello() {
     this.say("Hello", true);
 }
 return module.exports;
 }
-/********** End of module 7: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
+/********** End of module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

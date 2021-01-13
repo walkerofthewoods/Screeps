@@ -55,34 +55,34 @@ let creepLogic = __require(1,0);
 let roomLogic = __require(2,0);
 let prototypes = __require(3,0);
 
+module.exports.loop = function() {
+	Game.myRooms = _.filter(Game.rooms, (r) => r.controller && r.controller.level > 0 && r.controller.my);
+	_.forEach(Game.myRooms, (r) => roomLogic.spawning(r));
+	for (var name in Game.creeps) {
+		var creep = Game.creeps[name];
 
-module.exports.loop = function () {
-    Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
-    _.forEach(Game.myRooms, r => roomLogic.spawning(r));
-    for(var name in Game.creeps) {
-        var creep = Game.creeps[name];
+		let role = creep.memory.role;
+		if (creepLogic[role]) {
+			creepLogic[role].run(creep);
+		}
+	}
+	for (var name in Memory.creeps) {
+		if (!Game.creeps[name]) {
+			delete Memory.creeps[name];
+			console.log('Clearing non-existing creep memory:', name);
+		}
+	}
+};
 
-        let role = creep.memory.role;
-        if (creepLogic[role]) {
-            creepLogic[role].run(creep);
-        }
-    }
-    for(var name in Memory.creeps) {
-        if(!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
-        }
-    }
-}
 return module.exports;
 }
 /********** End of module 0: C:\Users\walke\Documents\Coding\screeps code folder\src\main.js **********/
 /********** Start module 1: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\index.js **********/
 __modules[1] = function(module, exports) {
 let creepLogic = {
-	harvester: __require(4,1),
-	upgrader: __require(5,1),
-	builder: __require(6,1)
+	builder: __require(4,1),
+	harvester: __require(5,1),
+	upgrader: __require(6,1)
 };
 
 module.exports = creepLogic;
@@ -93,23 +93,78 @@ return module.exports;
 /********** Start module 2: C:\Users\walke\Documents\Coding\screeps code folder\src\room\index.js **********/
 __modules[2] = function(module, exports) {
 let roomLogic = {
-    spawning:     __require(7,2),
-}
+	spawning: __require(7,2),
+	defense: __require(8,2),
+	positions: __require(9,2)
+};
 
 module.exports = roomLogic;
+
 return module.exports;
 }
 /********** End of module 2: C:\Users\walke\Documents\Coding\screeps code folder\src\room\index.js **********/
 /********** Start module 3: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\index.js **********/
 __modules[3] = function(module, exports) {
 let files = {
-    creep: __require(8,3)
+    creep: __require(10,3)
 }
 return module.exports;
 }
 /********** End of module 3: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\index.js **********/
-/********** Start module 4: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\harvester.js **********/
+/********** Start module 4: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\builder.js **********/
 __modules[4] = function(module, exports) {
+let prototypes = __require(3,4);
+
+var builder = {
+	/** @param {Creep} creep **/
+	run: function(creep) {
+		if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
+			creep.memory.building = false;
+			creep.say('🔄 harvest');
+		}
+		if (!creep.memory.building && creep.store.getFreeCapacity() == 0) {
+			creep.memory.building = true;
+			creep.say('🚧 build');
+		}
+
+		if (creep.memory.building) {
+			var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+			if (targets.length) {
+				if (creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
+					creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
+				}
+			}
+		} else {
+			var sources = creep.room.find(FIND_SOURCES);
+			if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
+				creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ffaa00' } });
+			}
+		}
+	},
+	spawn: function(room) {
+		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
+		console.log('Builders: ' + builders.length, room.name);
+
+		if (builders.length < 2) {
+			return true;
+		}
+	},
+	spawnData: function(room) {
+		let name = 'Builder' + Game.time;
+		let body = Creep.getBody([ WORK, CARRY, MOVE ], room);
+		let memory = { role: 'builder' };
+
+		return { name, body, memory };
+	}
+};
+
+module.exports = builder;
+
+return module.exports;
+}
+/********** End of module 4: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\builder.js **********/
+/********** Start module 5: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\harvester.js **********/
+__modules[5] = function(module, exports) {
 var harvester = {
 	/** @param {Creep} creep **/
 	run: function(creep) {
@@ -143,13 +198,13 @@ var harvester = {
 		);
 		console.log('Harvesters: ' + harvesters.length, room.name);
 
-		if (harvesters.length < 4) {
+		if (harvesters.length < 2) {
 			return true;
 		}
 	},
 	spawnData: function(room) {
 		let name = 'Harvester' + Game.time;
-		let body = [ WORK, CARRY, MOVE ];
+		let body = Creep.getBody([ WORK, CARRY, MOVE ], room);
 		let memory = { role: 'harvester' };
 
 		return { name, body, memory };
@@ -160,9 +215,9 @@ module.exports = harvester;
 
 return module.exports;
 }
-/********** End of module 4: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\harvester.js **********/
-/********** Start module 5: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\upgrader.js **********/
-__modules[5] = function(module, exports) {
+/********** End of module 5: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\harvester.js **********/
+/********** Start module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\upgrader.js **********/
+__modules[6] = function(module, exports) {
 var roleUpgrader = {
 	/** @param {Creep} creep **/
 	run: function(creep) {
@@ -193,13 +248,13 @@ var roleUpgrader = {
 		);
 		console.log('Upgraders: ' + upgraders.length, room.name);
 
-		if (upgraders.length < 4) {
+		if (upgraders.length < 2) {
 			return true;
 		}
 	},
 	spawnData: function(room) {
 		let name = 'Upgrader' + Game.time;
-		let body = [ WORK, CARRY, MOVE ];
+		let body = Creep.getBody([ WORK, CARRY, MOVE ], room);
 		let memory = { role: 'upgrader' };
 
 		return { name, body, memory };
@@ -210,57 +265,7 @@ module.exports = roleUpgrader;
 
 return module.exports;
 }
-/********** End of module 5: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\upgrader.js **********/
-/********** Start module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\builder.js **********/
-__modules[6] = function(module, exports) {
-var builder = {
-	/** @param {Creep} creep **/
-	run: function(creep) {
-		if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
-			creep.memory.building = false;
-			creep.say('🔄 harvest');
-		}
-		if (!creep.memory.building && creep.store.getFreeCapacity() == 0) {
-			creep.memory.building = true;
-			creep.say('🚧 build');
-		}
-
-		if (creep.memory.building) {
-			var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-			if (targets.length) {
-				if (creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-					creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
-				}
-			}
-		} else {
-			var sources = creep.room.find(FIND_SOURCES);
-			if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ffaa00' } });
-			}
-		}
-	},
-	spawn: function(room) {
-		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
-		console.log('Builders: ' + builders.length, room.name);
-
-		if (builders.length < 4) {
-			return true;
-		}
-	},
-	spawnData: function(room) {
-		let name = 'Builder' + Game.time;
-		let body = [ WORK, CARRY, MOVE ];
-		let memory = { role: 'builder' };
-
-		return { name, body, memory };
-	}
-};
-
-module.exports = builder;
-
-return module.exports;
-}
-/********** End of module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\builder.js **********/
+/********** End of module 6: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\upgrader.js **********/
 /********** Start module 7: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
 __modules[7] = function(module, exports) {
 let creepLogic = __require(1,7);
@@ -286,8 +291,85 @@ module.exports = spawnCreeps;
 return module.exports;
 }
 /********** End of module 7: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
-/********** Start module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
+/********** Start module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\room\defense.js **********/
 __modules[8] = function(module, exports) {
+function roomDefense(room) {
+	var towers = room.find(FIND_MY_STRUCTURES, {
+		filter: { structureType: STRUCTURE_TOWER }
+	});
+
+	if (towers.length) {
+		_.forEach(towers, function(tower) {
+			var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+				filter: (structure) => StructureTerminal.hits < structure.hitsMax
+			});
+			if (closestDamagedStructure) {
+				tower.repair(closestDamagedStructure);
+			}
+
+			var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+			if (closestHostile) {
+				tower.attack(closestHostile);
+			}
+		});
+	}
+}
+
+module.exports = roomDefense;
+return module.exports;
+}
+/********** End of module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\room\defense.js **********/
+/********** Start module 9: C:\Users\walke\Documents\Coding\screeps code folder\src\room\positions.js **********/
+__modules[9] = function(module, exports) {
+RoomPosition.prototype.getNearbyPositions = function getNearbyPositions() {
+	var positions = [];
+
+	let startX = this.x - 1 || 1;
+	let startY = this.y - 1 || 1;
+
+	for (x = startX; x <= this.x + 1 && x < 49; x++) {
+		for (y = startY; y <= this.y + 1 && y < 49; y++) {
+			if (x !== this.x || y !== this.y) {
+				positions.push(new RoomPosition(x, y, this.roomName));
+			}
+		}
+	}
+
+	return positions;
+};
+
+RoomPosition.prototype.getOpenPositions = function getOpenPositions() {
+	let nearbyPositions = this.getNearbyPositions();
+
+	let terrain = Game.map.getRoomTerrain(this.roomName);
+
+	const found = Game.flags.flag1.pos.lookFor(LOOK_CREEPS);
+	if (found.length && found[0].getActiveBodyparts(ATTACK) == 0) {
+		creep.moveTo(found[0]);
+	}
+
+	let walkablePositions = _.filter(nearbyPositions, function(pos) {
+		return !pos.lookFor(LOOK_CREEPS).length;
+	});
+
+	return freePositions;
+};
+
+function identifySources(room) {
+	let sources = room.find(FIND_SOURCES);
+	room.memory.resources = {};
+	_.forEach(sources, function(source) {
+		let data = _.get(room.memory, ['resources', room.name, 'energy', source.id]);
+		if (data === undefined) {
+			_.set(room.memory, ['resources', room.name, 'energy', source.id], {})
+		}
+	})
+}
+return module.exports;
+}
+/********** End of module 9: C:\Users\walke\Documents\Coding\screeps code folder\src\room\positions.js **********/
+/********** Start module 10: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
+__modules[10] = function(module, exports) {
 Creep.prototype.findEnergySource = function findEnergySource() {
 	let sources = this.room.find(FIND_SOURCES);
 	if (sources.length) {
@@ -306,7 +388,13 @@ Creep.prototype.findEnergySource = function findEnergySource() {
 };
 
 Creep.prototype.harvestEnergy = function harvestEnergy() {
-	let storedSource = Game.getObjectById(creep.memory.source);
+	console.log(this, this.memory.targetRoom);
+
+	if (this.memory.targetRoom && this.memory.targetRoom !== this.room.name) {
+		return this.moveToRoom(this.memory.targetRoom);
+	}
+
+	let storedSource = Game.getObjectById(this.memory.source);
 	if (!storedSource || (!storedSource.pos.getOpenPositions().length && !this.pos.isNearTo(storedSource))) {
 		delete this.memory.source;
 		storedSource = this.findEnergySource();
@@ -321,9 +409,25 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
 	}
 };
 
+Creep.prototype.moveToRoom = function moveToRoom(roomName) {
+	this.moveTo(new RoomPosition(25, 25, roomName));
+};
+
+Creep.getBody = function(segment, room) {
+	let body = [];
+	let segmentCost = _.sum(segment, (s) => BODYPART_COST[s]);
+	let energyAvailable = room.energyAvailable;
+	let maxSegments = Math.floor(energyAvailable / segmentCost);
+	_.times(maxSegments, function() {
+		_.forEach(segment, (s) => body.push(s));
+	});
+
+	return body;
+};
+
 return module.exports;
 }
-/********** End of module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
+/********** End of module 10: C:\Users\walke\Documents\Coding\screeps code folder\src\prototypes\creep.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

@@ -1,4 +1,4 @@
-var harvester = {
+var energyMiner = {
 	/** @param {Creep} creep **/
 	run: function(creep) {
 		if (creep.store.getFreeCapacity() > 0) {
@@ -26,24 +26,24 @@ var harvester = {
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
-		var harvesters = _.filter(
+		var energyMiners = _.filter(
 			Game.creeps,
-			(creep) => creep.memory.role == 'harvester' && creep.room.name == room.name
+			(creep) => creep.memory.role == 'energyMiner' && creep.room.name == room.name
 		);
-		console.log('Harvesters: ' + harvesters.length, room.name);
+		console.log('energyMiners: ' + energyMiners.length, room.name);
 
-		if (harvesters.length < 2) {
+		if (energyMiners.length < 2) {
 			return true;
 		}
 	},
 	// returns an object with the data to spawn a new creep
 	spawnData: function(room) {
-		let name = 'Harvester' + Game.time;
+		let name = 'energyMiner' + Game.time;
 		let body = Creep.getBody([ WORK, CARRY, MOVE ], room);
-		let memory = { role: 'harvester' };
+		let memory = { role: 'energyMiner', homeRoom: room.name };
 
 		return { name, body, memory };
 	}
 };
 
-module.exports = harvester;
+module.exports = energyMiner;

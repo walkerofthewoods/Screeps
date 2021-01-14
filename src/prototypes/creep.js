@@ -63,6 +63,6 @@ Creep.getBody = function(segment, room) {
 	_.times(maxSegments, function() {
 		_.forEach(segment, (s) => body.push(s));
 	});
-
+	console.log(body, maxSegments, energyAvailable, room);
 	return body;
 };

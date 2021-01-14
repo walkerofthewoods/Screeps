@@ -1,7 +1,6 @@
 let roomLogic = {
 	spawning: require('./spawning'),
-	defense: require('./defense'),
-	positions: require('./positions')
+	defense: require('./defense')
 };
 
 module.exports = roomLogic;

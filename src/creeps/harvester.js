@@ -3,7 +3,7 @@ var harvester = {
 	run: function(creep) {
 		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0) {
 			creep.memory.working = false;
-			creep.say('harvest');
+			creep.say('🔄 harvest');
 		}
 		if (!creep.memory.working && creep.store.getFreeCapacity() == 0) {
 			creep.memory.working = true;
@@ -17,7 +17,7 @@ var harvester = {
 					(struct.structureType == STRUCTURE_TOWER ||
 						struct.structureType == STRUCTURE_EXTENSION ||
 						struct.structureType == STRUCTURE_SPAWN) &&
-					struct.store.getFreeCapacity == 0
+					struct.store.getFreeCapacity == 0 //need to doublecheck on this zero
 				);
 			});
 			if (targets.length) {
@@ -38,13 +38,15 @@ var harvester = {
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
+		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 2);
+
 		var harvesters = _.filter(
 			Game.creeps,
 			(creep) => creep.memory.role == 'harvester' && creep.room.name == room.name
 		);
 		console.log('Harvesters: ' + harvesters.length, room.name);
 
-		if (harvesters.length < 2) {
+		if (harvesters.length < harvesterTarget) {
 			return true;
 		}
 	},
@@ -52,7 +54,7 @@ var harvester = {
 	spawnData: function(room) {
 		let name = 'Harvester' + Game.time;
 		let body = Creep.getBody([ WORK, CARRY, MOVE ], room);
-		let memory = { role: 'harvester' };
+		let memory = { role: 'harvester', homeRoom: room.name };
 
 		return { name, body, memory };
 	}

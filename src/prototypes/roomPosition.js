@@ -20,12 +20,16 @@ RoomPosition.prototype.getOpenPositions = function getOpenPositions() {
 
 	let terrain = Game.map.getRoomTerrain(this.roomName);
 
-	const found = Game.flags.flag1.pos.lookFor(LOOK_CREEPS);
-	if (found.length && found[0].getActiveBodyparts(ATTACK) == 0) {
-		creep.moveTo(found[0]);
-	}
+	//const found = Game.flags.flag1.pos.lookFor(LOOK_CREEPS);
+	//if (found.length && found[0].getActiveBodyparts(ATTACK) == 0) {
+	//	creep.moveTo(found[0]);
+	//}
 
 	let walkablePositions = _.filter(nearbyPositions, function(pos) {
+		return terrain.get(pos.x, pos.y) !== TERRAIN_MASK_WALL;
+	});
+
+	let freePositions = _.filter(walkablePositions, function(pos) {
 		return !pos.lookFor(LOOK_CREEPS).length;
 	});
 
@@ -36,9 +40,9 @@ function identifySources(room) {
 	let sources = room.find(FIND_SOURCES);
 	room.memory.resources = {};
 	_.forEach(sources, function(source) {
-		let data = _.get(room.memory, ['resources', room.name, 'energy', source.id]);
+		let data = _.get(room.memory, [ 'resources', room.name, 'energy', source.id ]);
 		if (data === undefined) {
-			_.set(room.memory, ['resources', room.name, 'energy', source.id], {})
+			_.set(room.memory, [ 'resources', room.name, 'energy', source.id ], {});
 		}
-	})
+	});
 }

@@ -1,3 +1,6 @@
 let files = {
-    creep: require("./creep")
-}
+	creep: require('./creep'),
+	roomPosition: require('./roomPosition')
+};
+
+module.exports = files;

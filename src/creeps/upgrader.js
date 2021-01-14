@@ -1,35 +1,36 @@
+const { upgrader } = require('.');
+
 var roleUpgrader = {
 	/** @param {Creep} creep **/
 	run: function(creep) {
-		if (creep.memory.upgrading && creep.store[RESOURCE_ENERGY] == 0) {
-			creep.memory.upgrading = false;
+		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0) {
+			creep.memory.working = false;
 			creep.say('🔄 harvest');
 		}
-		if (!creep.memory.upgrading && creep.store.getFreeCapacity() == 0) {
-			creep.memory.upgrading = true;
+		if (!creep.memory.working && creep.store.getFreeCapacity() == 0) {
+			creep.memory.working = true;
 			creep.say('⚡ upgrade');
 		}
 
-		if (creep.memory.upgrading) {
+		if (creep.memory.working) {
 			if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
 				creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#ffffff' } });
 			}
 		} else {
-			var sources = creep.room.find(FIND_SOURCES);
-			if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ffaa00' } });
-			}
+			creep.harvestEnergy();
 		}
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
+		let upgraderTarget = _.get(room.memory, [ 'census', 'upgrader' ], 2);
+
 		var upgraders = _.filter(
 			Game.creeps,
 			(creep) => creep.memory.role == 'upgrader' && creep.room.name == room.name
 		);
 		console.log('Upgraders: ' + upgraders.length, room.name);
 
-		if (upgraders.length < 2) {
+		if (upgraders.length < upgraderTarget) {
 			return true;
 		}
 	},
@@ -37,7 +38,7 @@ var roleUpgrader = {
 	spawnData: function(room) {
 		let name = 'Upgrader' + Game.time;
 		let body = Creep.getBody([ WORK, CARRY, MOVE ], room);
-		let memory = { role: 'upgrader' };
+		let memory = { role: 'upgrader', homeRoom: room.name };
 
 		return { name, body, memory };
 	}

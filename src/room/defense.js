@@ -1,4 +1,4 @@
-function roomDefense(room) {
+function towerDefense(room) {
 	var towers = room.find(FIND_MY_STRUCTURES, {
 		filter: { structureType: STRUCTURE_TOWER }
 	});
@@ -20,4 +20,4 @@ function roomDefense(room) {
 	}
 }
 
-module.exports = roomDefense;
+module.exports = towerDefense;

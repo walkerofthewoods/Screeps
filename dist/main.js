@@ -112,6 +112,7 @@ let prototypes = __require(9,3);
 
 var builder = {
 	/** @param {Creep} creep **/
+
 	run: function(creep) {
 		if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
 			creep.memory.building = false;
@@ -130,20 +131,7 @@ var builder = {
 				}
 			}
 		} else {
-			if (creep.store[RESOURCE_ENERGY] == 0) {
-				creep.harvestEnergy();
-			} else {
-				var closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-					filter: (structure) => StructureTerminal.hits < structure.hitsMax
-				});
-				if (closestDamagedStructure) {
-					if (creep.pos.inRangeTo(closestDamagedStructure, 3)) {
-						creep.repair(closestDamagedStructure);
-					} else {
-						creep.moveTo(closestDamagedStructure);
-					}
-				}
-			}
+			creep.harvestEnergy();
 		}
 	},
 	spawn: function(room) {
@@ -345,6 +333,7 @@ function spawnCreeps(room) {
 
 	if (creepSpawnData) {
 		console.log(room, JSON.stringify(creepSpawnData));
+
 		let spawn = room.find(FIND_MY_SPAWNS)[0];
 		let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, { memory: creepSpawnData.memory });
 

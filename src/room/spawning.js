@@ -18,6 +18,9 @@ function spawnCreeps(room) {
 		// find the first or 0th spawn in the room
 		// improvement needed: should be checking for not just the first spawn,
 		// but first spawn that isn't spawning a creep
+
+		// let spawns = _.filter()
+
 		let spawn = room.find(FIND_MY_SPAWNS)[0];
 		let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, { memory: creepSpawnData.memory });
 

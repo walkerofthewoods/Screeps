@@ -8,7 +8,7 @@ module.exports.loop = function() {
 
     // run spawn logic for each room in our empire
     // spawn, roomdefense, identifysources
-	_.forEach(Game.myRooms, (r) => roomLogic.spawning(r));
+	_.forEach(Game.myRooms, (room) => roomLogic.spawning(room));
 
 	// run each creep role see /creeps/index.js
 	for (var name in Game.creeps) {

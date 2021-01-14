@@ -1,27 +1,39 @@
 var harvester = {
 	/** @param {Creep} creep **/
 	run: function(creep) {
-		if (creep.store.getFreeCapacity() > 0) {
-			var sources = creep.room.find(FIND_SOURCES);
-			if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ffaa00' } });
+		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0) {
+			creep.memory.working = false;
+			creep.say('harvest');
+		}
+		if (!creep.memory.working && creep.store.getFreeCapacity() == 0) {
+			creep.memory.working = true;
+			creep.say('filling');
+		}
+
+		if (creep.memory.working) {
+			var targets = creep.room.find(FIND_MY_STRUCTURES);
+			targets = _.filter(targets, function(struct) {
+				return (
+					(struct.structureType == STRUCTURE_TOWER ||
+						struct.structureType == STRUCTURE_EXTENSION ||
+						struct.structureType == STRUCTURE_SPAWN) &&
+					struct.store.getFreeCapacity == 0
+				);
+			});
+			if (targets.length) {
+				// find closest target to creep
+				let target = creep.pos.findClosestByRange(targets);
+
+				// move to target
+				if (creep.pos.isNearTo(target)) {
+					// transfer energy
+					creep.transfer(target, RESOURCE_ENERGY);
+				} else {
+					creep.moveTo(target);
+				}
 			}
 		} else {
-			var targets = creep.room.find(FIND_STRUCTURES, {
-				filter: (structure) => {
-					return (
-						(structure.structureType == STRUCTURE_EXTENSION ||
-							structure.structureType == STRUCTURE_SPAWN ||
-							structure.structureType == STRUCTURE_TOWER) &&
-						structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-					);
-				}
-			});
-			if (targets.length > 0) {
-				if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-					creep.moveTo(targets[0], { visualizePathStyle: { stroke: '#ffffff' } });
-				}
-			}
+			creep.harvestEnergy();
 		}
 	},
 	// checks if the room needs to spawn a creep

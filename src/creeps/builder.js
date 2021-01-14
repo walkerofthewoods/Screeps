@@ -20,18 +20,18 @@ var builder = {
 				}
 			}
 		} else {
-			var sources = creep.room.find(FIND_SOURCES);
-			if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(sources[0], { visualizePathStyle: { stroke: '#ffaa00' } });
-			}
+			creep.harvestEnergy();
 		}
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
-		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
-		console.log('Builders: ' + builders.length, room.name);
+		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 2);
 
-		if (builders.length < 2) {
+		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
+		console.log('Builder: ' + builders.length, room.name);
+
+		var sites = room.find(FIND_CONSTRUCTION_SITES);
+		if (sites.length > 0 && builders.length < builderTarget) {
 			return true;
 		}
 	},
@@ -39,7 +39,7 @@ var builder = {
 	spawnData: function(room) {
 		let name = 'Builder' + Game.time;
 		let body = Creep.getBody([ WORK, CARRY, MOVE ], room);
-		let memory = { role: 'builder' };
+		let memory = { role: 'builder', homeRoom: room.name };
 
 		return { name, body, memory };
 	}

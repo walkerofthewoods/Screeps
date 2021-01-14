@@ -17,10 +17,9 @@ function spawnCreeps(room) {
 	if (creepSpawnData) {
 		console.log(room, JSON.stringify(creepSpawnData));
 
-		// find all spawns that are not currently spawning a creep
 		let spawns = room.find(FIND_MY_SPAWNS);
 
-		// iterate thru spawns until you find one not currently spawning
+		// iterate thru spawns until finding first available spawn and using it
 		spawns.some(function(spawn) {
 			if (spawn.spawning) {
 				return false;

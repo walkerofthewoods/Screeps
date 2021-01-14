@@ -322,6 +322,7 @@ return module.exports;
 /********** Start module 8: C:\Users\walke\Documents\Coding\screeps code folder\src\room\spawning.js **********/
 __modules[8] = function(module, exports) {
 let creepLogic = __require(1,8);
+const { spawn } = __require(5,8);
 let creepTypes = _.keys(creepLogic);
 
 function spawnCreeps(room) {
@@ -334,17 +335,17 @@ function spawnCreeps(room) {
 	if (creepSpawnData) {
 		console.log(room, JSON.stringify(creepSpawnData));
 		let spawns = room.find(FIND_MY_SPAWNS);
-		spawns = _.filter(spawns, function(structure) {
-			return !structure.spawning;
+		spawns.some(function(spawn) {
+			if (spawn.spawning) {
+				return false;
+			} else {
+				let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, {
+					memory: creepSpawnData.memory
+				});
+				console.log('Tried to Spawn:', creepTypeNeeded, result);
+				return true;
+			}
 		});
-
-		if (!spawns.length) {
-			return;
-		}
-
-		let result = spawns[0].spawnCreep(creepSpawnData.body, creepSpawnData.name, { memory: creepSpawnData.memory });
-
-		console.log('Tried to Spawn:', creepTypeNeeded, result);
 	}
 }
 

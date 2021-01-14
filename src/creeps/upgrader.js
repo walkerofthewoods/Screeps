@@ -1,6 +1,4 @@
-const { upgrader } = require('.');
-
-var roleUpgrader = {
+var upgrader = {
 	/** @param {Creep} creep **/
 	run: function(creep) {
 		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0) {
@@ -44,4 +42,4 @@ var roleUpgrader = {
 	}
 };
 
-module.exports = roleUpgrader;
+module.exports = upgrader;

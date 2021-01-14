@@ -130,7 +130,20 @@ var builder = {
 				}
 			}
 		} else {
-			creep.harvestEnergy();
+			if (creep.store[RESOURCE_ENERGY] == 0) {
+				creep.harvestEnergy();
+			} else {
+				var closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+					filter: (structure) => StructureTerminal.hits < structure.hitsMax
+				});
+				if (closestDamagedStructure) {
+					if (creep.pos.inRangeTo(closestDamagedStructure, 3)) {
+						creep.repair(closestDamagedStructure);
+					} else {
+						creep.moveTo(closestDamagedStructure);
+					}
+				}
+			}
 		}
 	},
 	spawn: function(room) {
@@ -179,7 +192,7 @@ var harvester = {
 					(struct.structureType == STRUCTURE_TOWER ||
 						struct.structureType == STRUCTURE_EXTENSION ||
 						struct.structureType == STRUCTURE_SPAWN) &&
-					struct.store.getFreeCapacity() > 0 //need to doublecheck on this zero
+					struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0
 				);
 			});
 			if (targets.length) {
@@ -195,7 +208,7 @@ var harvester = {
 		}
 	},
 	spawn: function(room) {
-		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 1);
+		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 2);
 
 		var harvesters = _.filter(
 			Game.creeps,

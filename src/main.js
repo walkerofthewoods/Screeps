@@ -11,7 +11,7 @@ module.exports.loop = function() {
 	// run defense logic for each room in our empire
 	_.forEach(Game.myRooms, (room) => roomLogic.defense(room));
 
-	// run source identifying logic for each room
+	// once every 500 ticks, run source identifying logic for each room
 	if (Game.time % 500 == 0) {
 		_.forEach(Game.myRooms, (room) => roomLogic.identify(room));
 	}

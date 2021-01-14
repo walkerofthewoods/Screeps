@@ -20,7 +20,20 @@ var builder = {
 				}
 			}
 		} else {
-			creep.harvestEnergy();
+			if (creep.store[RESOURCE_ENERGY] == 0) {
+				creep.harvestEnergy();
+			} else {
+				var closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+					filter: (structure) => StructureTerminal.hits < structure.hitsMax
+				});
+				if (closestDamagedStructure) {
+					if (creep.pos.inRangeTo(closestDamagedStructure, 3)) {
+						creep.repair(closestDamagedStructure);
+					} else {
+						creep.moveTo(closestDamagedStructure);
+					}
+				}
+			}
 		}
 	},
 	// checks if the room needs to spawn a creep

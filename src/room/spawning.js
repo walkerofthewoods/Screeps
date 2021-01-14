@@ -15,13 +15,16 @@ function spawnCreeps(room) {
 
 	if (creepSpawnData) {
 		console.log(room, JSON.stringify(creepSpawnData));
-		// find the first or 0th spawn in the room
-		// improvement needed: should be checking for not just the first spawn,
-		// but first spawn that isn't spawning a creep
 
-		// let spawns = _.filter()
+		// find all spawns that are not currently spawning a creep
+		let spawns = _.filter(room.find(FIND_MY_SPAWNS), {
+			filter: (structure) => !structure.spawning
+		});
 
-		let spawn = room.find(FIND_MY_SPAWNS)[0];
+		if (!spawns.length) {
+			return;
+		}
+
 		let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, { memory: creepSpawnData.memory });
 
 		console.log('Tried to Spawn:', creepTypeNeeded, result);

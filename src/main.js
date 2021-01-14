@@ -1,17 +1,20 @@
 let creepLogic = require('./creeps');
 let roomLogic = require('./room');
-let prototypes = require('./prototypes');
 
 module.exports.loop = function() {
 	// make a list of all of our rooms
 	Game.myRooms = _.filter(Game.rooms, (r) => r.controller && r.controller.level > 0 && r.controller.my);
 
 	// run spawn logic for each room in our empire
-	// spawn, roomdefense, identifysources
 	_.forEach(Game.myRooms, (room) => roomLogic.spawning(room));
 
 	// run defense logic for each room in our empire
 	_.forEach(Game.myRooms, (room) => roomLogic.defense(room));
+
+	// run source identifying logic for each room
+	if (Game.time % 500 == 0) {
+		_.forEach(Game.myRooms, (room) => roomLogic.identify(room));
+	}
 
 	// run each creep role see /creeps/index.js
 	for (var name in Game.creeps) {

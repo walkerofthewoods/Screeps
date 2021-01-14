@@ -17,7 +17,7 @@ var harvester = {
 					(struct.structureType == STRUCTURE_TOWER ||
 						struct.structureType == STRUCTURE_EXTENSION ||
 						struct.structureType == STRUCTURE_SPAWN) &&
-					struct.store.getFreeCapacity == 0 //need to doublecheck on this zero
+					struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0 //need to doublecheck on this zero
 				);
 			});
 			if (targets.length) {
@@ -38,7 +38,7 @@ var harvester = {
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
-		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 2);
+		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 1);
 
 		var harvesters = _.filter(
 			Game.creeps,

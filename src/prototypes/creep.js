@@ -7,7 +7,6 @@ Creep.prototype.findEnergySource = function findEnergySource() {
 		let sources = this.room.find(FIND_SOURCES);
 		if (sources.length) {
 			source = _.find(sources, function(s) {
-				console.log(s.pos, s.pos.getOpenPositions());
 				return s.pos.getOpenPositions().length > 0;
 			});
 		}
@@ -21,8 +20,6 @@ Creep.prototype.findEnergySource = function findEnergySource() {
 };
 
 Creep.prototype.harvestEnergy = function harvestEnergy() {
-	console.log(this, this.memory.targetRoom);
-
 	if (this.memory.targetRoom && this.memory.targetRoom !== this.room.name) {
 		return this.moveToRoom(this.memory.targetRoom);
 	}

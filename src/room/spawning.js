@@ -1,4 +1,5 @@
 let creepLogic = require('../creeps/index');
+const { spawn } = require('../creeps/upgrader');
 let creepTypes = _.keys(creepLogic);
 
 function spawnCreeps(room) {
@@ -17,17 +18,20 @@ function spawnCreeps(room) {
 		console.log(room, JSON.stringify(creepSpawnData));
 
 		// find all spawns that are not currently spawning a creep
-		let spawns = _.filter(room.find(FIND_MY_SPAWNS), {
-			filter: (structure) => !structure.spawning
+		let spawns = room.find(FIND_MY_SPAWNS);
+
+		// iterate thru spawns until you find one not currently spawning
+		spawns.some(function(spawn) {
+			if (spawn.spawning) {
+				return false;
+			} else {
+				let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, {
+					memory: creepSpawnData.memory
+				});
+				console.log('Tried to Spawn:', creepTypeNeeded, result);
+				return true;
+			}
 		});
-
-		if (!spawns.length) {
-			return;
-		}
-
-		let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, { memory: creepSpawnData.memory });
-
-		console.log('Tried to Spawn:', creepTypeNeeded, result);
 	}
 }
 

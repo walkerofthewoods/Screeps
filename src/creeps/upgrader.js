@@ -22,7 +22,7 @@ var roleUpgrader = {
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
-		let upgraderTarget = _.get(room.memory, [ 'census', 'upgrader' ], 2);
+		let upgraderTarget = _.get(room.memory, [ 'census', 'upgrader' ], 4);
 
 		var upgraders = _.filter(
 			Game.creeps,

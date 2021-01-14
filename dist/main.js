@@ -135,7 +135,7 @@ var builder = {
 		}
 	},
 	spawn: function(room) {
-		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 2);
+		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 1);
 
 		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
 		console.log('Builder: ' + builders.length, room.name);
@@ -196,7 +196,7 @@ var harvester = {
 		}
 	},
 	spawn: function(room) {
-		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 2);
+		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 1);
 
 		var harvesters = _.filter(
 			Game.creeps,
@@ -247,7 +247,7 @@ var roleUpgrader = {
 		}
 	},
 	spawn: function(room) {
-		let upgraderTarget = _.get(room.memory, [ 'census', 'upgrader' ], 2);
+		let upgraderTarget = _.get(room.memory, [ 'census', 'upgrader' ], 4);
 
 		var upgraders = _.filter(
 			Game.creeps,
@@ -333,9 +333,16 @@ function spawnCreeps(room) {
 
 	if (creepSpawnData) {
 		console.log(room, JSON.stringify(creepSpawnData));
+		let spawns = room.find(FIND_MY_SPAWNS);
+		spawns = _.filter(spawns, function(structure) {
+			return !structure.spawning;
+		});
 
-		let spawn = room.find(FIND_MY_SPAWNS)[0];
-		let result = spawn.spawnCreep(creepSpawnData.body, creepSpawnData.name, { memory: creepSpawnData.memory });
+		if (!spawns.length) {
+			return;
+		}
+
+		let result = spawns[0].spawnCreep(creepSpawnData.body, creepSpawnData.name, { memory: creepSpawnData.memory });
 
 		console.log('Tried to Spawn:', creepTypeNeeded, result);
 	}

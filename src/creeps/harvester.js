@@ -38,7 +38,7 @@ var harvester = {
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
-		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 1);
+		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 2);
 
 		var harvesters = _.filter(
 			Game.creeps,

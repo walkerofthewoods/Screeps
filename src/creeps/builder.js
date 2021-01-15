@@ -38,6 +38,7 @@ var builder = {
 			creep.say('🚧 build');
 		}
 
+		// improvement - make them remember location?
 		if (creep.memory.building) {
 			var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
 			if (targets.length) {
@@ -52,7 +53,7 @@ var builder = {
 
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
-		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 1);
+		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 2);
 
 		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
 		console.log('Builder: ' + builders.length, room.name);

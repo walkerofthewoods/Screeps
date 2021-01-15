@@ -122,7 +122,6 @@ var builder = {
 			creep.memory.building = true;
 			creep.say('🚧 build');
 		}
-
 		if (creep.memory.building) {
 			var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
 			if (targets.length) {
@@ -135,7 +134,7 @@ var builder = {
 		}
 	},
 	spawn: function(room) {
-		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 1);
+		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 2);
 
 		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
 		console.log('Builder: ' + builders.length, room.name);
@@ -196,7 +195,7 @@ var harvester = {
 		}
 	},
 	spawn: function(room) {
-		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 1);
+		let harvesterTarget = _.get(room.memory, [ 'census', 'harvester' ], 2);
 
 		var harvesters = _.filter(
 			Game.creeps,
@@ -224,9 +223,7 @@ return module.exports;
 /********** End of module 4: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\harvester.js **********/
 /********** Start module 5: C:\Users\walke\Documents\Coding\screeps code folder\src\creeps\upgrader.js **********/
 __modules[5] = function(module, exports) {
-const { upgrader } = __require(1,5);
-
-var roleUpgrader = {
+var upgrader = {
 	/** @param {Creep} creep **/
 	run: function(creep) {
 		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0) {
@@ -247,7 +244,7 @@ var roleUpgrader = {
 		}
 	},
 	spawn: function(room) {
-		let upgraderTarget = _.get(room.memory, [ 'census', 'upgrader' ], 4);
+		let upgraderTarget = _.get(room.memory, [ 'census', 'upgrader' ], 6);
 
 		var upgraders = _.filter(
 			Game.creeps,
@@ -268,7 +265,7 @@ var roleUpgrader = {
 	}
 };
 
-module.exports = roleUpgrader;
+module.exports = upgrader;
 
 return module.exports;
 }
@@ -334,6 +331,7 @@ function spawnCreeps(room) {
 
 	if (creepSpawnData) {
 		console.log(room, JSON.stringify(creepSpawnData));
+
 		let spawns = room.find(FIND_MY_SPAWNS);
 		spawns.some(function(spawn) {
 			if (spawn.spawning) {

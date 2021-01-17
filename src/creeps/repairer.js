@@ -11,7 +11,7 @@ var repairer = {
 		}
 
 		if (creep.memory.working) {
-			var closestDamagedStructure = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+			var closestDamagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
 				filter: (structure) => structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL
 			});
 
@@ -26,7 +26,7 @@ var repairer = {
 	},
 	// checks if the room needs to spawn a creep
 	spawn: function(room) {
-		let repairerTarget = _.get(room.memory, [ 'census', 'repairer' ], 1);
+		let repairerTarget = _.get(room.memory, [ 'census', 'repairer' ], 0);
 
 		var repairers = _.filter(
 			Game.creeps,

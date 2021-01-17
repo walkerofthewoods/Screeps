@@ -1,5 +1,6 @@
 let creepLogic = require('./creeps');
 let roomLogic = require('./room');
+let traveler = require('./prototypes/traveler');
 
 module.exports.loop = function() {
 	// make a list of all of our rooms

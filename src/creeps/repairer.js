@@ -11,18 +11,17 @@ var repairer = {
 		}
 
 		if (creep.memory.working) {
-			var closestDamagedStructure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-				filter: (structure) => structure.hits < structure.hitsMax
+			var closestDamagedStructure = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+				filter: (structure) => structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL
 			});
+
 			if (closestDamagedStructure) {
-				if (creep.pos.inRangeTo(closestDamagedStructure, 3)) {
-					creep.repair(closestDamagedStructure);
-				} else {
+				if (creep.repair(closestDamagedStructure) == ERR_NOT_IN_RANGE) {
 					creep.moveTo(closestDamagedStructure);
 				}
-			} else {
-				creep.harvestEnergy();
 			}
+		} else {
+			creep.harvestEnergy();
 		}
 	},
 	// checks if the room needs to spawn a creep

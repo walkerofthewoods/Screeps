@@ -134,7 +134,7 @@ var builder = {
 		}
 	},
 	spawn: function(room) {
-		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 2);
+		let builderTarget = _.get(room.memory, [ 'census', 'builder' ], 1);
 
 		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
 		console.log('Builder: ' + builders.length, room.name);
